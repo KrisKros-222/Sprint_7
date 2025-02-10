@@ -6,15 +6,17 @@ import java.util.List;
 public class CourierData {
     private String login;
     private String password;
-    private Integer id;
+    private String firstName;
 
     public CourierData(String login, String password) {
         this.login = login;
         this.password = password;
     }
 
-    public CourierData() {
-
+    public CourierData(String login, String password, String firstName) {
+        this.login = login;
+        this.password = password;
+        this.firstName = firstName;
     }
 
     public String getLogin() {
@@ -25,8 +27,12 @@ public class CourierData {
         return password;
     }
 
-    public Integer getId() {
-        return id;
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public void setLogin(String login) {
@@ -36,10 +42,5 @@ public class CourierData {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
 
 }

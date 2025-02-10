@@ -1,71 +1,74 @@
-import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.Before;
 import org.junit.Test;
-import java.io.File;
-
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.is;
 
 public class CourierCreationTest {
+    private static final String BASE_URI = "https://qa-scooter.praktikum-services.ru/";
+    private CourierSteps courier;
+
     @Before
-    public void setUp() {
-        RestAssured.baseURI= "https://qa-scooter.praktikum-services.ru/";
+    public void before() {
+        courier = new CourierSteps(BASE_URI);
     }
 
     @Test
     @DisplayName("При передаче всех необходимых параметров можно создать курьера")
     public void createCourier() {
-        Response response = sendPostRequestCreateCourier("fullBodyForCreation.json");
+        Response response = courier.sendPostRequestCreateCourier();
         response.then().statusCode(201);
-        compareSuccessBody(response,"ok",true);
+        courier.checkBodySuccess(response,"ok",true);
+        Response login = courier.sendPostRequestToGetId();
+        Response delete = courier.getIdAndDelete(login);
+        delete.then().statusCode(200);
     }
 
     @Test
     @DisplayName("Нельзя создать двух одинаковых курьеров")
     public void cannotCreateTwoSimilarCouriers() {
-        Response response = sendPostRequestCreateCourier("fullBodyForCreation.json");
-        response.then().statusCode(409);
+        courier.sendPostRequestCreateCourier();
+        Response responseTwo = courier.sendPostRequestCreateCourier();
+        responseTwo.then().statusCode(409);
+        courier.checkBody(responseTwo,"message","Этот логин уже используется");
+        Response login = courier.sendPostRequestToGetId();
+        Response delete = courier.getIdAndDelete(login);
+        delete.then().statusCode(200);
     }
 
     @Test
     @DisplayName("Если логина нет, запрос возвращает ошибку")
     public void creationWithoutLogin() {
-        Response response = sendPostRequestCreateCourier("creationWithoutLogin.json");
+        courier.sendPostRequestCreateCourier();
+        Response response = courier.createCourierWithoutLogin();
         response.then().statusCode(400);
+        courier.checkBody(response,"message","Недостаточно данных для создания учетной записи");
+        Response login = courier.sendPostRequestToGetId();
+        Response delete = courier.getIdAndDelete(login);
+        delete.then().statusCode(200);
     }
 
     @Test
     @DisplayName("Если пароля нет, запрос возвращает ошибку")
     public void creationWithoutPassword() {
-        Response response = sendPostRequestCreateCourier("creationWithoutPassword.json");
+        courier.sendPostRequestCreateCourier();
+        Response response = courier.createCourierWithoutPassword();
         response.then().statusCode(400);
+        courier.checkBody(response,"message","Недостаточно данных для создания учетной записи");
+        Response login = courier.sendPostRequestToGetId();
+        Response delete = courier.getIdAndDelete(login);
+        delete.then().statusCode(200);
     }
 
     @Test
     @DisplayName("Нельзя создать курьера с существующим логином")
     public void creationWithExistingLogin() {
-        Response response = sendPostRequestCreateCourier("anotherPassword.json");
+        courier.sendPostRequestCreateCourier();
+        Response response = courier.createCourierWithAnotherPassword();
         response.then().statusCode(409);
-    }
-
-    @Step("Отправляем POST запрос на ручку /api/v1/courier")
-    public Response sendPostRequestCreateCourier(String param) {
-        File parameters = new File("src/main/resources/" + param);
-        Response response = given()
-                .header("Content-type","application/json")
-                .and()
-                .body(parameters)
-                .when()
-                .post("/api/v1/courier");
-        return response;
-    }
-
-    @Step("Проверяем тело ответа при успешном запросе")
-    public void compareSuccessBody(Response response,String path, Boolean text) {
-        response.then().assertThat().body(path,is(text));
+        courier.checkBody(response,"message","Этот логин уже используется");
+        Response login = courier.sendPostRequestToGetId();
+        Response delete = courier.getIdAndDelete(login);
+        delete.then().statusCode(200);
     }
 
 }
