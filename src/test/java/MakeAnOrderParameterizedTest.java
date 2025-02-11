@@ -1,5 +1,6 @@
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +12,7 @@ public class MakeAnOrderParameterizedTest {
     private final List<String> colour;
     private static final String BASE_URI = "https://qa-scooter.praktikum-services.ru/";
     private OrderSteps order;
+    private Response response;
 
     public MakeAnOrderParameterizedTest(List<String> colour) {
         this.colour = colour;
@@ -35,8 +37,12 @@ public class MakeAnOrderParameterizedTest {
     @Test
     @DisplayName("Создаем заказ")
     public void createAnOrder() {
-        Response response = order.sendPostRequestToCreateOrder(colour);
+        response = order.sendPostRequestToCreateOrder("Ванька","Иванов","Подмосковье","3","+79002556633",3 ,"2020-06-06","Хочу побыстрее", colour);
         order.checkTrackNumber(response);
+    }
+
+    @After
+    public void after() {
         Response cancel = order.cancelOrderByTrack(response);
         cancel.then().statusCode(200);
     }

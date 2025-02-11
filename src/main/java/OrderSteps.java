@@ -16,8 +16,8 @@ public class OrderSteps {
     // Шаги для MakeAnOrderTest
 
     @Step("Отправляем POST запрос на ручку /api/v1/orders")
-    public Response sendPostRequestToCreateOrder(List<String> colour) {
-        OrderData order = new OrderData("Ванька","Иванов","Подмосковье","3","+79002556633",3 ,"2020-06-06","Хочу побыстрее", colour);
+    public Response sendPostRequestToCreateOrder(String firstName, String lastName, String address, String metroStation, String phone, int rentTime, String deliveryDate, String comment, List<String> colour) {
+        OrderData order = new OrderData(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, colour);
         Response response = given()
                 .baseUri(baseURI)
                 .header("Content-type","application/json")
@@ -49,21 +49,6 @@ public class OrderSteps {
     }
 
     //Шаги для ListOfOrders
-
-    @Step("Отправляем POST запрос на ручку /api/v1/orders")
-    public Response sendPostRequestToCreateOrder() {
-        OrderData order =
-                new OrderData("Петр","Петров","Калинина","2","+79225554411",2,"2020-06-06","Удачи", List.of(""));
-
-        Response response = given()
-                .baseUri(baseURI)
-                .header("Content-type","application/json")
-                .and()
-                .body(order)
-                .when()
-                .post("/api/v1/orders");
-        return response;
-    }
 
     @Step("Отправляем GET запрос на ручку /api/v1/orders")
     public Response sendGetRequestToLookOrders() {

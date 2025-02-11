@@ -1,5 +1,6 @@
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,59 +16,51 @@ public class CourierCreationTest {
     @Test
     @DisplayName("При передаче всех необходимых параметров можно создать курьера")
     public void createCourier() {
-        Response response = courier.sendPostRequestCreateCourier();
+        Response response = courier.createCourier("ghghgh","6666","sysysys");
         response.then().statusCode(201);
         courier.checkBodySuccess(response,"ok",true);
-        Response login = courier.sendPostRequestToGetId();
-        Response delete = courier.getIdAndDelete(login);
-        delete.then().statusCode(200);
     }
 
     @Test
     @DisplayName("Нельзя создать двух одинаковых курьеров")
     public void cannotCreateTwoSimilarCouriers() {
-        courier.sendPostRequestCreateCourier();
-        Response responseTwo = courier.sendPostRequestCreateCourier();
+        courier.createCourier("ghghgh","6666","sysysys");
+        Response responseTwo = courier.createCourier("ghghgh","6666","sysysys");
         responseTwo.then().statusCode(409);
         courier.checkBody(responseTwo,"message","Этот логин уже используется");
-        Response login = courier.sendPostRequestToGetId();
-        Response delete = courier.getIdAndDelete(login);
-        delete.then().statusCode(200);
     }
 
     @Test
     @DisplayName("Если логина нет, запрос возвращает ошибку")
     public void creationWithoutLogin() {
-        courier.sendPostRequestCreateCourier();
-        Response response = courier.createCourierWithoutLogin();
+        courier.createCourier("ghghgh","6666","sysysys");
+        Response response = courier.createCourier("","6666","sysysys");
         response.then().statusCode(400);
         courier.checkBody(response,"message","Недостаточно данных для создания учетной записи");
-        Response login = courier.sendPostRequestToGetId();
-        Response delete = courier.getIdAndDelete(login);
-        delete.then().statusCode(200);
     }
 
     @Test
     @DisplayName("Если пароля нет, запрос возвращает ошибку")
     public void creationWithoutPassword() {
-        courier.sendPostRequestCreateCourier();
-        Response response = courier.createCourierWithoutPassword();
+        courier.createCourier("ghghgh","6666","sysysys");
+        Response response = courier.createCourier("ghghgh","","sysysys");
         response.then().statusCode(400);
         courier.checkBody(response,"message","Недостаточно данных для создания учетной записи");
-        Response login = courier.sendPostRequestToGetId();
-        Response delete = courier.getIdAndDelete(login);
-        delete.then().statusCode(200);
     }
 
     @Test
     @DisplayName("Нельзя создать курьера с существующим логином")
     public void creationWithExistingLogin() {
-        courier.sendPostRequestCreateCourier();
-        Response response = courier.createCourierWithAnotherPassword();
+        courier.createCourier("ghghgh","6666","sysysys");
+        Response response = courier.createCourier("ghghgh","0000","sysysys");
         response.then().statusCode(409);
         courier.checkBody(response,"message","Этот логин уже используется");
-        Response login = courier.sendPostRequestToGetId();
-        Response delete = courier.getIdAndDelete(login);
+    }
+
+    @After
+    public void after() {
+        Response log = courier.sendPostRequestToGetId("ghghgh","6666","sysysys");
+        Response delete = courier.getIdAndDelete(log);
         delete.then().statusCode(200);
     }
 

@@ -16,47 +16,8 @@ public class CourierSteps {
     // Шаги для CourierCreationTest
 
     @Step("Отправляем POST запрос на ручку /api/v1/courier")
-    public Response sendPostRequestCreateCourier() {
-        CourierData courier = new CourierData("Pashuuumdlh","12345","Sssss");
-        Response response = given()
-                .baseUri(baseURI)
-                .header("Content-type","application/json")
-                .and()
-                .body(courier)
-                .when()
-                .post("/api/v1/courier");
-        return response;
-    }
-
-    @Step("Создаем курьера без логина")
-    public Response createCourierWithoutLogin() {
-        CourierData courier = new CourierData("","12345","Sssss");
-        Response response = given()
-                .baseUri(baseURI)
-                .header("Content-type","application/json")
-                .and()
-                .body(courier)
-                .when()
-                .post("/api/v1/courier");
-        return response;
-    }
-
-    @Step("Создаем курьера без пароля")
-    public Response createCourierWithoutPassword() {
-        CourierData courier = new CourierData("Pashuuumdlh","","Sssss");
-        Response response = given()
-                .baseUri(baseURI)
-                .header("Content-type","application/json")
-                .and()
-                .body(courier)
-                .when()
-                .post("/api/v1/courier");
-        return response;
-    }
-
-    @Step("Создаем курьера с существующим логином, но другим паролем")
-    public Response createCourierWithAnotherPassword() {
-        CourierData courier = new CourierData("Pashuuumdlh","1111","Sssss");
+    public Response createCourier(String login, String password, String firstName) {
+        CourierData courier = new CourierData(login,password,firstName);
         Response response = given()
                 .baseUri(baseURI)
                 .header("Content-type","application/json")
@@ -78,16 +39,16 @@ public class CourierSteps {
     }
 
     @Step("Отправляем POST запрос на ручку /api/v1/courier/login")
-    public Response sendPostRequestToGetId() {
-        CourierData courier = new CourierData("Pashuuumdlh","12345","Sssss");
-        Response login = given()
+    public Response sendPostRequestToGetId(String login, String password, String firstName) {
+        CourierData courier = new CourierData(login,password,firstName);
+        Response log = given()
                 .baseUri(baseURI)
                 .header("Content-type","application/json")
                 .and()
                 .body(courier)
                 .when()
                 .post("/api/v1/courier/login");
-        return login;
+        return log;
     }
 
     @Step("Получение id курьера и удаление созданного курьера")
@@ -104,8 +65,8 @@ public class CourierSteps {
     // Шаги для CourierLoginTest
 
     @Step("Создание нового курьера")
-    public Response createNewCourier() {
-        CourierData courier = new CourierData("Masha","5555");
+    public Response createCourierLogin(String login, String password) {
+        CourierData courier = new CourierData(login,password);
         Response newCourier = given()
                 .baseUri(baseURI)
                 .header("Content-type","application/json")
@@ -117,73 +78,8 @@ public class CourierSteps {
     }
 
     @Step("Отправляем POST запрос на ручку /api/v1/courier/login")
-    public Response sendPostRequestSuccessful() {
-        CourierData courier = new CourierData("Masha","5555");
-        Response response = given()
-                .baseUri(baseURI)
-                .header("Content-type","application/json")
-                .and()
-                .body(courier)
-                .when()
-                .post("/api/v1/courier/login");
-        return response;
-    }
-
-    @Step("Отправляем POST запрос с неправильным логином в теле")
-    public Response sendPostRequestIncorrectLogin() {
-        CourierData courier = new CourierData("Pasha","5555");
-        Response response = given()
-                .baseUri(baseURI)
-                .header("Content-type","application/json")
-                .and()
-                .body(courier)
-                .when()
-                .post("/api/v1/courier/login");
-        return response;
-    }
-
-    @Step("Отправляем POST запрос с неправильным паролем в теле")
-    public Response sendPostRequestIncorrectPass() {
-        CourierData courier = new CourierData("Masha","55535");
-        Response response = given()
-                .baseUri(baseURI)
-                .header("Content-type","application/json")
-                .and()
-                .body(courier)
-                .when()
-                .post("/api/v1/courier/login");
-        return response;
-    }
-
-    @Step("Отправляем POST запрос без пароля в теле")
-    public Response sendPostRequestWithoutLogin() {
-        CourierData courier = new CourierData("","5555");
-        Response response = given()
-                .baseUri(baseURI)
-                .header("Content-type","application/json")
-                .and()
-                .body(courier)
-                .when()
-                .post("/api/v1/courier/login");
-        return response;
-    }
-
-    @Step("Отправляем POST запрос без пароля в теле")
-    public Response sendPostRequestWithoutPass() {
-        CourierData courier = new CourierData("Masha","");
-        Response response = given()
-                .baseUri(baseURI)
-                .header("Content-type","application/json")
-                .and()
-                .body(courier)
-                .when()
-                .post("/api/v1/courier/login");
-        return response;
-    }
-
-    @Step("Отправляем POST запрос без пароля в теле")
-    public Response sendPostRequestNonexistentUser() {
-        CourierData courier = new CourierData("Pasha","1234");
+    public Response sendPostRequest(String login, String password) {
+        CourierData courier = new CourierData(login,password);
         Response response = given()
                 .baseUri(baseURI)
                 .header("Content-type","application/json")
@@ -205,9 +101,9 @@ public class CourierSteps {
     }
 
     @Step("Получение id курьера и удаление созданного курьера")
-    public Response getIdAndDeleteInLoginTest(){
-        Response login = sendPostRequestSuccessful();
-        String id = login.then().extract().jsonPath().getString("id");
+    public Response getIdAndDeleteInLoginTest(String login, String password){
+        Response log = sendPostRequest(login, password);
+        String id = log.then().extract().jsonPath().getString("id");
 
         Response delete = given()
                 .baseUri(baseURI)

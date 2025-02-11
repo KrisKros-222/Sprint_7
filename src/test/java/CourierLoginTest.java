@@ -1,5 +1,6 @@
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,57 +11,56 @@ public class CourierLoginTest {
     @Before
     public void before() {
         courier = new CourierSteps(BASE_URI);
-        courier.createNewCourier();
+        courier.createCourierLogin("Masha","6666");
     }
 
     //Через Postman выдает 404 Not Found
     @Test
     @DisplayName("Проверка возможности авторизации курьера")
     public void successfulCourierAuthorization() {
-        Response response = courier.sendPostRequestSuccessful();
+        Response response = courier.sendPostRequest("Masha","6666");
         courier.checkCodeAndTextOfSuccess(response);
-        courier.getIdAndDeleteInLoginTest();
     }
 
     @Test
     @DisplayName("Система вернет ошибку если неправильно указать логин")
     public void incorrectLogin() {
-        Response response = courier.sendPostRequestIncorrectLogin();
+        Response response = courier.sendPostRequest("Mashas","6666");
         courier.checkCodeAndTextOfError(response,404,"message","Учетная запись не найдена");
-        courier.getIdAndDeleteInLoginTest();
     }
 
     @Test
     @DisplayName("Система вернет ошибку если неправильно указать пароль")
     public void incorrectPassword() {
-        Response response = courier.sendPostRequestIncorrectPass();
+        Response response = courier.sendPostRequest("Masha","66665");
         courier.checkCodeAndTextOfError(response,404,"message","Учетная запись не найдена");
-        courier.getIdAndDeleteInLoginTest();
     }
 
     @Test
     @DisplayName("Система вернет ошибку если логин отсутствует")
     public void withoutLogin() {
-        Response response = courier.sendPostRequestWithoutLogin();
+        Response response = courier.sendPostRequest("","6666");
         courier.checkCodeAndTextOfError(response,400,"message","Недостаточно данных для входа");
-        courier.getIdAndDeleteInLoginTest();
     }
 
     @Test
     @DisplayName("Система вернет ошибку если пароль отсутствует")
     public void withoutPassword() {
-        Response response = courier.sendPostRequestWithoutPass();
+        Response response = courier.sendPostRequest("Masha","");
         courier.checkCodeAndTextOfError(response,400,"message","Недостаточно данных для входа");
-        courier.getIdAndDeleteInLoginTest();
     }
 
     //При использовании несуществующей пары логин/пароль код 201 - баг
     @Test
     @DisplayName("Система вернет ошибку если авторизоваться под несуществующим пользователем")
     public void nonexistentUser() {
-        Response response = courier.sendPostRequestNonexistentUser();
+        Response response = courier.sendPostRequest("Mashad","66665");
         courier.checkCodeAndTextOfError(response,404,"message","Учетная запись не найдена");
-        courier.getIdAndDeleteInLoginTest();
+    }
+
+    @After
+    public void after() {
+        courier.getIdAndDeleteInLoginTest("Masha","6666");
     }
 
 }
