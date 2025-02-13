@@ -11,14 +11,14 @@ public class CourierLoginTest {
     @Before
     public void before() {
         courier = new CourierSteps(BASE_URI);
-        courier.createCourierLogin("Masha","6666");
+        courier.createCourierLogin("Mashaaa","6666");
     }
 
     //Через Postman выдает 404 Not Found
     @Test
     @DisplayName("Проверка возможности авторизации курьера")
     public void successfulCourierAuthorization() {
-        Response response = courier.sendPostRequest("Masha","6666");
+        Response response = courier.sendPostRequest("Mashaaa","6666");
         courier.checkCodeAndTextOfSuccess(response);
     }
 
@@ -32,7 +32,7 @@ public class CourierLoginTest {
     @Test
     @DisplayName("Система вернет ошибку если неправильно указать пароль")
     public void incorrectPassword() {
-        Response response = courier.sendPostRequest("Masha","66665");
+        Response response = courier.sendPostRequest("Mashaaa","66665");
         courier.checkCodeAndTextOfError(response,404,"message","Учетная запись не найдена");
     }
 
@@ -46,7 +46,7 @@ public class CourierLoginTest {
     @Test
     @DisplayName("Система вернет ошибку если пароль отсутствует")
     public void withoutPassword() {
-        Response response = courier.sendPostRequest("Masha","");
+        Response response = courier.sendPostRequest("Mashaaa","");
         courier.checkCodeAndTextOfError(response,400,"message","Недостаточно данных для входа");
     }
 

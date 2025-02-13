@@ -81,12 +81,13 @@ public class CourierSteps {
     public Response sendPostRequest(String login, String password) {
         CourierData courier = new CourierData(login,password);
         Response response = given()
+                .log().all()
                 .baseUri(baseURI)
                 .header("Content-type","application/json")
                 .and()
                 .body(courier)
                 .when()
-                .post("/api/v1/courier/login");
+                .post("api/v1/courier/login");
         return response;
     }
 

@@ -36,15 +36,12 @@ public class OrderSteps {
     @Step("Получаем значение track и отменяем заказ")
     public Response cancelOrderByTrack(Response response) {
         String trackNumber = response.then().extract().jsonPath().getString("track");
-        String json = "{\"track\": " + trackNumber + "}";
 
         Response cancel = given()
                 .baseUri(baseURI)
                 .header("Content-type","application/json")
-                .and()
-                .body(json)
                 .when()
-                .put("/api/v1/orders/cancel");
+                .put("/api/v1/orders/cancel/?track=" + trackNumber);
         return cancel;
     }
 

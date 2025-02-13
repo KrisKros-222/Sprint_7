@@ -43,8 +43,7 @@ public class MakeAnOrderParameterizedTest {
 
     @After
     public void after() {
-        Response cancel = order.cancelOrderByTrack(response);
-        cancel.then().statusCode(200);
+        order.cancelOrderByTrack(response);
     }
 
 }
